@@ -47,6 +47,12 @@ candidate must fit the artifact's `max_length` (32,768 tokens for
 wyat-2-1.4b). Requests over declared capacity are unsupported; malformed inputs
 and device failures remain errors.
 
+On CUDA, the fastest path needs `PYTORCH_CUDA_ALLOC_CONF` without
+`expandable_segments`. The loader replays short candidate batches whose shapes
+repeat as CUDA graphs, and capture needs the default allocator segments. With
+`expandable_segments` set, the loader falls back to eager scoring without a
+message: answers and probabilities are identical, but those batches run slower.
+
 The adapter's laws use [tlaw](https://github.com/teilomillet/tlaw) 0.0.12. The
 first file checks the adapter alone against a stand-in model; the second loads
 a tiny random v2 artifact on CPU and needs a directory holding Ouro's
